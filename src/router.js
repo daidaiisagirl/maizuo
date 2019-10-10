@@ -13,7 +13,7 @@ import Login from './views/login/index.vue'
 
 Vue.use(Router)
 
-export default new Router({
+const router = new Router({
   routes: [
     {
       path: '/',
@@ -31,6 +31,10 @@ export default new Router({
         {
           path: 'center',
           component: Center
+        },
+        {
+          path: '',
+          redirect: '/films'
         }
       ]
     },
@@ -41,7 +45,10 @@ export default new Router({
     },
     {
       path: '/balance',
-      component: Balance
+      component: Balance,
+      meta: {
+        needLogin: true
+      }
     },
     {
       path: '/login',
@@ -53,3 +60,19 @@ export default new Router({
     }
   ]
 })
+router.beforeEach((to, from, next) => {
+  let userinfo = window.localStorage.getItem('userinfo')
+  if (!userinfo && to.meta.needLogin) {
+    // next('/login')
+    next({
+      path: '/login',
+      query: {
+        redirect: to.fullPath
+      }
+    })
+  } else {
+    next()
+  }
+})
+
+export default router
